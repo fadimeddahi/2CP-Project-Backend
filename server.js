@@ -49,6 +49,7 @@ app.get('/', (req, res) => {
         register: 'POST /api/users/register',
         login: 'POST /api/users/login',
         // Ajoutez d'autres endpoints utilisateur ici
+      },
       gyms: {
         create: 'POST /api/gyms',
         search: 'GET /api/gyms?ville=...',
