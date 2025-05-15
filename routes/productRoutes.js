@@ -18,4 +18,19 @@ router.post('/:id/image',
   productController.uploadProductImage
 );
 
+// PATCH /api/products/:productId
+router.patch('/:productId', 
+  protect, 
+  restrictTo('admin'),
+  productController.updateProduct
+);
+
+// PATCH /api/products/:id/image (for updating image)
+router.patch('/:id/image',
+  protect,
+  restrictTo('admin'),
+  upload.single('image'), // Single image
+  productController.uploadProductImage
+);
+
 module.exports = router;

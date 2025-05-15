@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const { protect, restrictTo } = require('../middlewares/auth'); // Importez les middlewares nécessaires
 const userController = require('../controllers/userController'); // Assurez-vous que le chemin est correct
+const upload = require('../utils/uploadFile');
 
 const router = express.Router();
 
@@ -30,7 +31,17 @@ router.post(
 // GET /api/users - Récupérer tous les utilisateurs (protégé, réservé aux administrateurs)
 router.get('/', protect, restrictTo('admin'), userController.getAllUsers);
 
-// GET /api/users/:id - Récupérer un utilisateur par ID (protégé, réservé aux administrateurs)
+// First define specific routes
+router.get('/coaches', userController.getCoaches);
+
+// Then define parameter-based routes
 router.get('/:id', protect, restrictTo('admin'), userController.getUserById);
+
+// Add this new route for uploading user photos
+router.patch('/:id/photo',
+  protect,
+  upload.single('photo'),
+  userController.uploadUserPhoto
+);
 
 module.exports = router;

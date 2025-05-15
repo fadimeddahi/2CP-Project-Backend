@@ -154,3 +154,62 @@ exports.test = async (req, res) => {
     });
   }
 };
+
+// Add this new controller function
+exports.getCoaches = async (req, res) => {
+  try {
+    const coaches = await User.find({ 
+      $or: [
+        { role: 'coach' },
+        { status: 'coach' }
+      ]
+    }).select('-password');
+    
+    res.status(200).json({
+      status: 'success',
+      results: coaches.length,
+      data: coaches
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Add this new controller function
+exports.uploadUserPhoto = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+    
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ error: 'Aucun fichier téléchargé' });
+    }
+    
+    // Generate file URL
+    const photoUrl = `${req.protocol}://${req.get('host')}/uploads/users/${req.file.filename}`;
+    
+    // Update user with new photo URL
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { photo: photoUrl },
+      { new: true }
+    ).select('-password');
+    
+    res.status(200).json({
+      status: 'success',
+      data: {
+        photo: photoUrl,
+        user: updatedUser
+      }
+    });
+  } catch (err) {
+    console.error('Error uploading user photo:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
